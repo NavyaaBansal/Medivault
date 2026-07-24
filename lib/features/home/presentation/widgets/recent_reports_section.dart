@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../reports/providers/report_list_provider.dart';
@@ -83,6 +84,12 @@ class RecentReportsSection extends ConsumerWidget {
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
                   child: ListTile(
+                    onTap: () {
+                      context.push(
+                        '/report-details',
+                        extra: report,
+                      );
+                    },
                     leading: const Icon(Icons.description),
                     title: Text(report.name),
                     subtitle: Text(report.category),
