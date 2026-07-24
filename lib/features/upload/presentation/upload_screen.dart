@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medivault/features/upload/presentation/widgets/attachment_picker.dart';
 import 'package:medivault/features/upload/presentation/widgets/category_dropdown.dart';
 import 'package:medivault/features/upload/presentation/widgets/date_picker_field.dart';
@@ -7,16 +8,19 @@ import 'package:medivault/features/upload/presentation/widgets/save_button.dart'
 
 import '../../../core/services/storage_service.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../reports/domain/models/medical_report.dart';
+import '../../reports/providers/report_list_provider.dart';
+import '../../reports/providers/report_providers.dart';
 import 'widgets/report_name_field.dart';
 
-class UploadScreen extends StatefulWidget {
+class UploadScreen extends ConsumerStatefulWidget {
   const UploadScreen({super.key});
 
   @override
-  State<UploadScreen> createState() => _UploadScreenState();
+  ConsumerState<UploadScreen> createState() => _UploadScreenState();
 }
 
-class _UploadScreenState extends State<UploadScreen> {
+class _UploadScreenState extends ConsumerState<UploadScreen> {
   final TextEditingController reportNameController =
   TextEditingController();
 
@@ -61,6 +65,44 @@ class _UploadScreenState extends State<UploadScreen> {
     setState(() {
       selectedFilePath = storedPath;
     });
+  }
+
+  Future<void> _saveReport() async {
+    if (reportNameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a report name'),
+        ),
+      );
+      return;
+    }
+
+    if (selectedFilePath == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a report file'),
+        ),
+      );
+      return;
+    }
+    final repository = ref.read(reportRepositoryProvider);
+
+    final report = MedicalReport()
+      ..name = reportNameController.text.trim()
+      ..category = selectedCategory
+      ..reportDate = selectedDate
+      ..filePath = selectedFilePath!
+      ..createdAt = DateTime.now();
+
+    await repository.saveReport(report);
+
+    ref.invalidate(reportsProvider);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Report saved successfully'),
+      ),
+    );
   }
 
   @override
@@ -114,9 +156,7 @@ class _UploadScreenState extends State<UploadScreen> {
                 const SizedBox(height: AppSpacing.xl),
 
                 SaveButton(
-                  onPressed: () {
-                    print(reportNameController.text);
-                  },
+                  onPressed: _saveReport,
                 ),
               ],
             ),
