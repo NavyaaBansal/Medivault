@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../reports/providers/report_list_provider.dart';
+import '../../../reports/providers/search_provider.dart';
 
 class RecentReportsSection extends ConsumerWidget {
   const RecentReportsSection({super.key});
@@ -11,6 +12,7 @@ class RecentReportsSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final reportsAsync = ref.watch(reportsProvider);
+    final searchQuery = ref.watch(searchQueryProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -37,6 +39,13 @@ class RecentReportsSection extends ConsumerWidget {
           ),
 
           data: (reports) {
+            final filteredReports = reports.where((report) {
+              final query = searchQuery.toLowerCase();
+
+              return report.name.toLowerCase().contains(query) ||
+                  report.category.toLowerCase().contains(query);
+            }).toList();
+
             if (reports.isEmpty) {
               return Container(
                 width: double.infinity,
@@ -77,9 +86,9 @@ class RecentReportsSection extends ConsumerWidget {
             return ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: reports.length,
+              itemCount: filteredReports.length,
               itemBuilder: (context, index) {
-                final report = reports[index];
+                final report = filteredReports[index];
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
