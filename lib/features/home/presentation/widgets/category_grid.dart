@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_spacing.dart';
+import '../../../reports/providers/category_provider.dart';
 import 'category_card.dart';
 
-class CategoryGrid extends StatelessWidget {
+class CategoryGrid extends ConsumerWidget  {
   const CategoryGrid({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedCategory = ref.watch(selectedCategoryProvider);
     final categories = [
+      (
+      Icons.apps,
+      "All",
+      Colors.grey,
+      ),
       (
       Icons.bloodtype,
       "Blood Test",
@@ -58,6 +66,10 @@ class CategoryGrid extends StatelessWidget {
               icon: category.$1,
               title: category.$2,
               color: category.$3,
+              isSelected: selectedCategory == category.$2,
+              onTap: () {
+                ref.read(selectedCategoryProvider.notifier).state = category.$2;
+              },
             );
           },
         ),

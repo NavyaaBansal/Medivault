@@ -8,22 +8,34 @@ class CategoryCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final Color color;
+  final bool isSelected;
+  final VoidCallback onTap;
 
   const CategoryCard({
     super.key,
     required this.icon,
     required this.title,
     required this.color,
+    required this.isSelected,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
-      ),
+    return InkWell(
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: isSelected
+              ? color.withOpacity(0.12)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(
+            color: isSelected ? color : AppColors.border,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
@@ -51,6 +63,7 @@ class CategoryCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

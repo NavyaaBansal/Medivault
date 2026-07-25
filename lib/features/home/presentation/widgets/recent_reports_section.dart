@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_spacing.dart';
+import '../../../reports/providers/category_provider.dart';
 import '../../../reports/providers/report_list_provider.dart';
 import '../../../reports/providers/search_provider.dart';
 
@@ -13,6 +14,7 @@ class RecentReportsSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final reportsAsync = ref.watch(reportsProvider);
     final searchQuery = ref.watch(searchQueryProvider);
+    final selectedCategory = ref.watch(selectedCategoryProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -42,8 +44,15 @@ class RecentReportsSection extends ConsumerWidget {
             final filteredReports = reports.where((report) {
               final query = searchQuery.toLowerCase();
 
-              return report.name.toLowerCase().contains(query) ||
-                  report.category.toLowerCase().contains(query);
+              final matchesSearch =
+                  report.name.toLowerCase().contains(query) ||
+                      report.category.toLowerCase().contains(query);
+
+              final matchesCategory =
+                  selectedCategory == 'All' ||
+                      report.category == selectedCategory;
+
+              return matchesSearch && matchesCategory;
             }).toList();
 
             if (reports.isEmpty) {
