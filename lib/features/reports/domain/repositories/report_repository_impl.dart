@@ -18,6 +18,11 @@ class ReportRepositoryImpl implements ReportRepository {
   }
 
   @override
+  Future<void> updateReport(MedicalReport report) {
+    return localDataSource.updateReport(report);
+  }
+
+  @override
   Future<void> deleteReport(int id) {
     return localDataSource.deleteReport(id);
   }

@@ -4,6 +4,7 @@ import 'package:medivault/features/reports/domain/models/medical_report.dart';
 
 import '../../../../core/services/file_service.dart';
 import '../../../../core/services/storage_service.dart';
+import '../../../upload/presentation/upload_screen.dart';
 import '../../providers/report_list_provider.dart';
 import '../../providers/report_providers.dart';
 
@@ -85,6 +86,30 @@ class ReportDetailsScreen extends ConsumerWidget  {
               ),
             ),
             const SizedBox(height: 16),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  final updated = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => UploadScreen(report: report),
+                    ),
+                  );
+
+                  if (updated == true) {
+                    ref.invalidate(reportsProvider);
+
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  }
+                },
+                icon: const Icon(Icons.edit),
+                label: const Text('Edit Report'),
+              ),
+            ),
 
             SizedBox(
               width: double.infinity,

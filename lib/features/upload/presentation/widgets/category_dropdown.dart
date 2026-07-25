@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/constants/report_categories.dart';
+
 class CategoryDropdown extends StatelessWidget {
   final String selectedCategory;
   final ValueChanged<String> onChanged;
@@ -12,12 +14,10 @@ class CategoryDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> categories = [
-      'Blood Test',
-      'Prescription',
-      'X-Ray',
-      'Heart',
-    ];
+    final List<String> categories = ReportCategories.categories
+        .where((category) => category.name != 'All')
+        .map((category) => category.name)
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

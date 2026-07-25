@@ -5,5 +5,7 @@ abstract class ReportRepository {
 
   Future<List<MedicalReport>> getAllReports();
 
+  Future<void> updateReport(MedicalReport report);
+
   Future<void> deleteReport(int id);
 }

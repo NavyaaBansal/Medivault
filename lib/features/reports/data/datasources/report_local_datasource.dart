@@ -13,6 +13,12 @@ class ReportLocalDataSource {
     return await IsarService.isar.medicalReports.where().findAll();
   }
 
+  Future<void> updateReport(MedicalReport report) async {
+    await IsarService.isar.writeTxn(() async {
+      await IsarService.isar.medicalReports.put(report);
+    });
+  }
+
   Future<void> deleteReport(int id) async {
     await IsarService.isar.writeTxn(() async {
       await IsarService.isar.medicalReports.delete(id);

@@ -14,7 +14,12 @@ import '../../reports/providers/report_providers.dart';
 import 'widgets/report_name_field.dart';
 
 class UploadScreen extends ConsumerStatefulWidget {
-  const UploadScreen({super.key});
+  final MedicalReport? report;
+
+  const UploadScreen({
+    super.key,
+    this.report,
+  });
 
   @override
   ConsumerState<UploadScreen> createState() => _UploadScreenState();
@@ -31,6 +36,20 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
   DateTime selectedDate = DateTime.now();
 
   String? selectedFilePath;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final report = widget.report;
+
+    if (report != null) {
+      reportNameController.text = report.name;
+      selectedCategory = report.category;
+      selectedDate = report.reportDate;
+      selectedFilePath = report.filePath;
+    }
+  }
 
   Future<void> pickReportDate() async {
     final pickedDate = await showDatePicker(
@@ -87,22 +106,40 @@ class _UploadScreenState extends ConsumerState<UploadScreen> {
     }
     final repository = ref.read(reportRepositoryProvider);
 
-    final report = MedicalReport()
-      ..name = reportNameController.text.trim()
-      ..category = selectedCategory
-      ..reportDate = selectedDate
-      ..filePath = selectedFilePath!
-      ..createdAt = DateTime.now();
+    if (widget.report == null) {
+      final report = MedicalReport()
+        ..name = reportNameController.text.trim()
+        ..category = selectedCategory
+        ..reportDate = selectedDate
+        ..filePath = selectedFilePath!
+        ..createdAt = DateTime.now();
 
-    await repository.saveReport(report);
+      await repository.saveReport(report);
+    } else {
+      widget.report!
+        ..name = reportNameController.text.trim()
+        ..category = selectedCategory
+        ..reportDate = selectedDate
+        ..filePath = selectedFilePath!;
+
+      await repository.updateReport(widget.report!);
+    }
 
     ref.invalidate(reportsProvider);
 
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Report saved successfully'),
+      SnackBar(
+        content: Text(
+          widget.report == null
+              ? 'Report saved successfully'
+              : 'Report updated successfully',
+        ),
       ),
     );
+
+    Navigator.pop(context, true);
   }
 
   @override
